@@ -2,6 +2,10 @@ import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import * as https from "https";
 import * as querystring from "querystring";
 
+function getEnvironmentVariable(name: string): string {
+  return process.env[name];
+}
+
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
@@ -18,15 +22,14 @@ const httpTrigger: AzureFunction = async function (
       reject();
     }
 
-    const facebookClientSecret = "2925820d6bea115e74be1bb58309985c";
     const options = {
-      host: "graph.facebook.com",
-      port: 443,
-      path: "/v3.1/oauth/access_token",
+      host: getEnvironmentVariable("tokenHost"),
+      port: parseInt(getEnvironmentVariable("tokenPort")),
+      path: getEnvironmentVariable("tokenPath"),
       method: "POST",
     };
     const params = querystring.parse(body);
-    params.client_secret = facebookClientSecret;
+    params.client_secret = getEnvironmentVariable("facebookClientSecret");
     const postData = querystring.stringify();
 
     let result = null;
